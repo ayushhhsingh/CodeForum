@@ -1,4 +1,4 @@
-export const db ="codeforum";
+export const db ="STACK";
 export const questionCollection = "questions"
 export const answerCollection = "answers"
 export const commentCollection = "comments"
