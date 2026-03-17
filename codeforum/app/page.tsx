@@ -1,4 +1,4 @@
-import { databases } from "@/models/server/config";
+import { health } from "@/models/server/config";
 
 type ConnectionState = {
   connected: boolean;
@@ -7,10 +7,24 @@ type ConnectionState = {
 
 async function getAppwriteStatus(): Promise<ConnectionState> {
   try {
-    await databases.list();
+    await health.get();
     return { connected: true, message: "Appwrite is connected successfully." };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
+    if (/401|unauthorized|missing scope/i.test(message)) {
+      return {
+        connected: false,
+        message:
+          "Connected to Appwrite, but APPWRITE_API_KEY is invalid or missing required scopes.",
+      };
+    }
+    if (/404|not found/i.test(message)) {
+      return {
+        connected: false,
+        message:
+          "Appwrite endpoint seems incorrect. Check NEXT_PUBLIC_APPWRITE_ENDPOINT (it usually ends with /v1).",
+      };
+    }
     return { connected: false, message };
   }
 }
