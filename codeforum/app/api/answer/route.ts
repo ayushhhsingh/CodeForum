@@ -1,33 +1,8 @@
 import { answerCollection, db } from "@/models/name";
-import type { UserPrefs } from "@/models/user";
 import { databases, users } from "@/models/server/config";
 import { NextRequest, NextResponse } from "next/server";
 import { ID } from "node-appwrite";
-
-const getErrorMessage = (error: unknown) => {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return "Unknown error";
-};
-
-const getErrorStatus = (error: unknown) => {
-  if (typeof error === "object" && error !== null) {
-    const status = "status" in error ? error.status : undefined;
-    const code = "code" in error ? error.code : undefined;
-
-    if (typeof status === "number") {
-      return status;
-    }
-
-    if (typeof code === "number") {
-      return code;
-    }
-  }
-
-  return 500;
-};
+import type { UserPrefs } from "@/models/user";
 
 export async function POST(request: NextRequest){
   try {
@@ -49,13 +24,13 @@ export async function POST(request: NextRequest){
       status: 201
     })
 
-  } catch (error: unknown) {
+  } catch (error: any) {
     return NextResponse.json(
       {
-        error: getErrorMessage(error) || "Error creating answer"
+        error: error?.message || "Error creating answer"
       },
       {
-        status: getErrorStatus(error)
+        status: error?.status || error?.code || 500
       }
     )
   }
@@ -82,13 +57,13 @@ export async function DELETE(request: NextRequest){
 
 
 
-  } catch (error: unknown) {
+  } catch (error: any) {
     return NextResponse.json(
       {
-        message: getErrorMessage(error) || "Error deleting the answer"
+        message: error?.message || "Error deleting the answer"
       },
       {
-        status: getErrorStatus(error)
+        status: error?.status || error?.code || 500
       }
     )
   }
