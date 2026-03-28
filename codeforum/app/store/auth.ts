@@ -3,11 +3,8 @@ import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 
 import { AppwriteException, ID, Models } from "appwrite";
+import type { UserPrefs } from "@/models/user";
 import { account } from "../../models/client/config";
-
-export interface UserPrefs {
-  reputation: number;
-}
 
 interface AuthState {
   session: Models.Session | null;
