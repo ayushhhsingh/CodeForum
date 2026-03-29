@@ -5,7 +5,15 @@ import { users } from "@/models/server/config";
 import { Models, Query } from "node-appwrite";
 import type { UserPrefs } from "@/models/user";
 import convertDateToRelativeTime from "@/utils/relativeTime";
-import { avatars } from "@/models/client/config";
+
+function getInitials(name: string) {
+    return name
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(part => part.charAt(0).toUpperCase())
+        .join("");
+}
 
 const Notification = ({ user }: { user: Models.User<UserPrefs> }) => {
     return (
@@ -21,13 +29,9 @@ const Notification = ({ user }: { user: Models.User<UserPrefs> }) => {
             )}
         >
             <div className="flex flex-row items-center gap-3">
-                <picture>
-                    <img
-                        src={avatars.getInitials(user.name, 40, 40).href}
-                        alt={user.name}
-                        className="rounded-2xl"
-                    />
-                </picture>
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-black/10 text-sm font-semibold dark:bg-white/10 dark:text-white">
+                    {getInitials(user.name)}
+                </div>
                 <div className="flex flex-col overflow-hidden">
                     <figcaption className="flex flex-row items-center whitespace-pre text-lg font-medium dark:text-white">
                         <span className="text-sm sm:text-lg">{user.name}</span>

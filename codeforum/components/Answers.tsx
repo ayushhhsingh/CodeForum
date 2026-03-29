@@ -1,16 +1,36 @@
 "use client";
 
-import { ID, Models } from "appwrite";
+import { Models } from "appwrite";
 import React from "react";
 import VoteButtons from "./VoteButton";
 import { useAuthStore } from "@/store/auth";
-import { avatars, databases } from "@/models/client/config";
-import { answerCollection, db } from "@/models/name";
 import RTE, { MarkdownPreview } from "./RTE";
 import Comments from "./comment";
 import slugify from "@/utils/slugify";
 import Link from "next/link";
 import { IconTrash } from "@tabler/icons-react";
+
+function getInitials(name: string) {
+    return name
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(part => part.charAt(0).toUpperCase())
+        .join("");
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+    if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof error.message === "string"
+    ) {
+        return error.message;
+    }
+
+    return fallback;
+}
 
 const Answers = ({
     answers: _answers,
@@ -55,8 +75,8 @@ const Answers = ({
                     ...prev.documents,
                 ],
             }));
-        } catch (error: any) {
-            window.alert(error?.message || "Error creating answer");
+        } catch (error: unknown) {
+            window.alert(getErrorMessage(error, "Error creating answer"));
         }
     };
 
@@ -77,8 +97,8 @@ const Answers = ({
                 total: prev.total - 1,
                 documents: prev.documents.filter(answer => answer.$id !== answerId),
             }));
-        } catch (error: any) {
-            window.alert(error?.message || "Error deleting answer");
+        } catch (error: unknown) {
+            window.alert(getErrorMessage(error, "Error deleting answer"));
         }
     };
 
@@ -106,13 +126,9 @@ const Answers = ({
                     <div className="w-full overflow-auto">
                         <MarkdownPreview className="rounded-xl p-4" source={answer.content} />
                         <div className="mt-4 flex items-center justify-end gap-1">
-                            <picture>
-                                <img
-                                    src={avatars.getInitials(answer.author.name, 36, 36).href}
-                                    alt={answer.author.name}
-                                    className="rounded-lg"
-                                />
-                            </picture>
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10 text-sm font-semibold text-white">
+                                {getInitials(answer.author.name)}
+                            </div>
                             <div className="block leading-tight">
                                 <Link
                                     href={`/users/${answer.author.$id}/${slugify(answer.author.name)}`}
@@ -136,9 +152,12 @@ const Answers = ({
                 </div>
             ))}
             <hr className="my-4 border-white/40" />
-            <form onSubmit={handleSubmit} className="space-y-2">
+            <form id="answer-form" onSubmit={handleSubmit} className="space-y-2 scroll-mt-28">
                 <h2 className="mb-4 text-xl">Your Answer</h2>
-                <RTE value={newAnswer} onChange={value => setNewAnswer(() => value || "")} />
+                <RTE
+                    value={newAnswer || undefined}
+                    onChange={value => setNewAnswer(() => value || "")}
+                />
                 <button className="shrink-0 rounded bg-orange-500 px-4 py-2 font-bold text-white hover:bg-orange-600">
                     Post Your Answer
                 </button>

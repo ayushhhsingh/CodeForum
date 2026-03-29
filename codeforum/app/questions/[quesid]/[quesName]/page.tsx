@@ -11,6 +11,7 @@ import { listCommentsSafe, listVotesSafe, toPlain } from "@/lib/appwrite-documen
 import { storage as clientStorage } from "@/models/client/config";
 import { answerCollection, db, questionAttachmentBucket, questionCollection } from "@/models/name";
 import { databases, users } from "@/models/server/config";
+import convertDateToRelativeTime from "@/utils/relativeTime";
 import slugify from "@/utils/slugify";
 import { Query } from "node-appwrite";
 import Link from "next/link";
@@ -110,15 +111,23 @@ export default async function QuestionPage({
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold">{question.title}</h1>
-            <p className="mt-2 text-sm text-white/60">
-              Asked by{" "}
-              <Link
-                href={`/users/${author.$id}/${slugify(author.name)}`}
-                className="text-orange-500 hover:text-orange-600"
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/60">
+              <p>
+                Asked by{" "}
+                <Link
+                  href={`/users/${author.$id}/${slugify(author.name)}`}
+                  className="text-orange-500 hover:text-orange-600"
+                >
+                  {author.name}
+                </Link>
+              </p>
+              <time
+                dateTime={question.$createdAt}
+                title={new Date(question.$createdAt).toLocaleString()}
               >
-                {author.name}
-              </Link>
-            </p>
+                Asked {convertDateToRelativeTime(new Date(question.$createdAt))}
+              </time>
+            </div>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-3">
             <QuestionEditButton

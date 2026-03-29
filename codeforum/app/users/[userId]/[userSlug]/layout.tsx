@@ -5,21 +5,13 @@ import {
   isPausedProjectError,
 } from "@/lib/appwrite-error";
 import AnimatedGridPattern from "@/components/magicui/animated-grid-pattern";
+import ProfileAvatarUploader from "@/components/ProfileAvatarUploader";
 import convertDateToRelativeTime from "@/utils/relativeTime";
 import { cn } from "@/utils/cn";
 import React from "react";
 import EditButton from "../../EditButton";
 import Navbar from "../../Navbar";
 import { IconClockFilled, IconUserFilled } from "@tabler/icons-react";
-
-function getInitials(name: string) {
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("");
-}
 
 const Layout = async ({
   children,
@@ -65,22 +57,12 @@ const Layout = async ({
       />
       <div className="container relative z-10 mx-auto space-y-4 px-4 pb-20 pt-32">
         <div className="flex flex-col gap-4 sm:flex-row">
-          <div className="w-24 shrink-0">
-            <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-white/10 shadow-xl">
-              {user.prefs?.avatarUrl ? (
-                <img
-                  src={user.prefs.avatarUrl}
-                  alt={user.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="text-2xl font-semibold tracking-wide text-white">
-                  {getInitials(user.name)}
-                </span>
-              )}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,165,0,0.18),transparent_58%)]" />
-            </div>
-          </div>
+          <ProfileAvatarUploader
+            profileUserId={user.$id}
+            name={user.name}
+            avatarUrl={user.prefs?.avatarUrl}
+            avatarFileId={user.prefs?.avatarFileId}
+          />
           <div className="w-full">
             <div className="flex items-start justify-between">
               <div className="block space-y-0.5">

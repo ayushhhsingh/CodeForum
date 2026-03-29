@@ -16,10 +16,10 @@ const Footer = () => {
         {
             title: "Privacy Policy",
             href: "/privacy-policy",
-        },
+        },    
         {
-            title: "Terms of Service",
-            href: "/terms-of-service",
+            title: "Contact me",
+            href: "/https://www.linkedin.com/in/ayush-singh-8b90572b",
         },
         {
             title: "Questions",

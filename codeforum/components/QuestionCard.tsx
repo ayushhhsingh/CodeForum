@@ -5,9 +5,17 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Models } from "appwrite";
 import slugify from "@/utils/slugify";
-import { avatars } from "@/models/client/config";
 import convertDateToRelativeTime from "@/utils/relativeTime";
 import QuestionEditButton from "@/components/QuestionEditButton";
+
+function getInitials(name: string) {
+    return name
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(part => part.charAt(0).toUpperCase())
+        .join("");
+}
 
 const QuestionCard = ({ ques }: { ques: Models.Document }) => {
     return (
@@ -32,7 +40,27 @@ const QuestionCard = ({ ques }: { ques: Models.Document }) => {
                 >
                     <h2 className="text-xl">{ques.title}</h2>
                 </Link>
-                <div className="mt-3">
+                {ques.content ? (
+                    <p className="mt-3 whitespace-pre-line text-sm leading-6 text-white/75">
+                        {ques.content}
+                    </p>
+                ) : null}
+                {ques.attachmentId ? (
+                    <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-2">
+                        <img
+                            src={`/api/question-attachment/${ques.attachmentId}`}
+                            alt={ques.title}
+                            className="max-h-72 w-full rounded-xl object-cover"
+                        />
+                    </div>
+                ) : null}
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <Link
+                        href={`/questions/${ques.$id}/${slugify(ques.title)}#answer-form`}
+                        className="rounded-full border border-orange-500/40 bg-orange-500/10 px-3 py-1 text-xs font-medium text-orange-400 transition hover:bg-orange-500/20"
+                    >
+                        Reply
+                    </Link>
                     <QuestionEditButton
                         questionId={ques.$id}
                         questionSlug={slugify(ques.title)}
@@ -52,13 +80,9 @@ const QuestionCard = ({ ques }: { ques: Models.Document }) => {
                         </Link>
                     ))}
                     <div className="ml-auto flex items-center gap-1">
-                        <picture>
-                            <img
-                                src={avatars.getInitials(ques.author.name, 24, 24).href}
-                                alt={ques.author.name}
-                                className="rounded-lg"
-                            />
-                        </picture>
+                        <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/10 text-[10px] font-semibold text-white">
+                            {getInitials(ques.author.name)}
+                        </div>
                         <Link
                             href={`/users/${ques.author.$id}/${slugify(ques.author.name)}`}
                             className="text-orange-500 hover:text-orange-600"
