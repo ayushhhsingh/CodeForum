@@ -12,6 +12,7 @@ interface AuthState {
   user: Models.User<UserPrefs> | null;
   hydrated: boolean;
   setHydrated(): void;
+  refreshUser(): Promise<void>;
   verifySession(): Promise<void>;
   login(
     email: string,
@@ -39,12 +40,26 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
+      async refreshUser() {
+        try {
+          const user = await account.get<UserPrefs>();
+
+          set((state) => {
+            state.user = user;
+          });
+        } catch (error) {
+          console.error("Error refreshing user:", error);
+        }
+      },
+
       async verifySession() {
         try {
           const session = await account.getSession("current");
+          const user = await account.get<UserPrefs>();
 
           set((state) => {
             state.session = session;
+            state.user = user;
           });
         } catch (error) {
           console.error("Error verifying session:", error);

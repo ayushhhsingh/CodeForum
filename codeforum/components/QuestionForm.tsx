@@ -9,7 +9,7 @@ import { useAuthStore } from "@/store/auth";
 import { cn } from "@/lib/utils";
 import slugify from "@/utils/slugify";
 import { IconX } from "@tabler/icons-react";
-import { Models, ID } from "appwrite";
+import { Models, ID, Permission, Role } from "appwrite";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { databases, storage } from "@/models/client/config";
@@ -129,13 +129,20 @@ const QuestionForm = ({ question }: { question?: Models.Document }) => {
         frame();
     };
 
+    const attachmentPermissions = [
+        Permission.read(Role.any()),
+        Permission.update(Role.user(formData.authorId)),
+        Permission.delete(Role.user(formData.authorId)),
+    ];
+
     const create = async () => {
         const attachmentId = formData.attachment
             ? (
                   await storage.createFile(
                       questionAttachmentBucket,
                       ID.unique(),
-                      formData.attachment
+                      formData.attachment,
+                      attachmentPermissions
                   )
               ).$id
             : undefined;
@@ -164,7 +171,8 @@ const QuestionForm = ({ question }: { question?: Models.Document }) => {
             const file = await storage.createFile(
                 questionAttachmentBucket,
                 ID.unique(),
-                formData.attachment
+                formData.attachment,
+                attachmentPermissions
             );
 
             return file.$id;
@@ -241,7 +249,7 @@ const QuestionForm = ({ question }: { question?: Models.Document }) => {
                     </small>
                 </Label>
                 <RTE
-                    value={formData.content}
+                    value={formData.content || undefined}
                     onChange={value => setFormData(prev => ({ ...prev, content: value || "" }))}
                 />
             </LabelInputContainer>

@@ -1,7 +1,8 @@
-import { db, questionAttachmentBucket } from "../name";
+import { db, profileAvatarBucket, questionAttachmentBucket } from "../name";
 import { databases, storage } from "./config";
 import createAnswerCollection from "./answer.collection";
 import createCommentCollection from "./comment.collection";
+import createProfileAvatarBucket from "./profile-avatar.storage.collection";
 import createAttachmentBucket from "./storage.collection";
 import createQuestionCollection from "./question.collection";
 import createVoteCollection from "./vote.collection";
@@ -68,6 +69,7 @@ async function run() {
   await ensureCollection("comments", createCommentCollection);
   await ensureCollection("votes", createVoteCollection);
   await ensureBucket(questionAttachmentBucket, createAttachmentBucket);
+  await ensureBucket(profileAvatarBucket, createProfileAvatarBucket);
   console.log("Appwrite DB setup completed.");
 }
 
