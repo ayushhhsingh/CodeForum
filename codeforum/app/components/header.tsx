@@ -3,10 +3,16 @@ import React from "react";
 import { FloatingNav } from "@/components/ui/floatimg-navbar";
 import { IconHome, IconMessage, IconWorldQuestion } from "@tabler/icons-react";
 import { useAuthStore } from "@/store/auth";
+import { usePathname } from "next/navigation";
 import slugify from "@/utils/slugify";
 
 export default function Header() {
     const { user } = useAuthStore();
+    const pathname = usePathname();
+
+    if (pathname === "/login" || pathname === "/register") {
+        return null;
+    }
 
     const navItems = [
         {

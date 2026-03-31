@@ -6,6 +6,20 @@ import { AppwriteException, ID, Models } from "appwrite";
 import type { UserPrefs } from "@/models/user";
 import { account } from "../../models/client/config";
 
+function toAuthError(error: unknown): AppwriteException {
+  if (error instanceof AppwriteException) {
+    return error;
+  }
+
+  if (error instanceof Error && /failed to fetch/i.test(error.message)) {
+    return new AppwriteException(
+      "Unable to reach Appwrite from the browser. Check the Appwrite endpoint and add this Vercel domain to Appwrite Platforms."
+    );
+  }
+
+  return new AppwriteException("Unexpected authentication error");
+}
+
 interface AuthState {
   session: Models.Session | null;
   jwt: string | null;
@@ -91,7 +105,7 @@ export const useAuthStore = create<AuthState>()(
           return { success: true, error: null };
         } catch (error) {
           console.error("Login error:", error);
-          return { success: false, error: error as AppwriteException };
+          return { success: false, error: toAuthError(error) };
         }
       },
 
@@ -102,7 +116,7 @@ export const useAuthStore = create<AuthState>()(
           return { success: true, error: null };
         } catch (error) {
           console.error("Error creating account:", error);
-          return { success: false, error: error as AppwriteException };
+          return { success: false, error: toAuthError(error) };
         }
       },
 
