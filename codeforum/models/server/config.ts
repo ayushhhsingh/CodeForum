@@ -1,42 +1,79 @@
-import { Avatars, Client ,Users, Databases, Health, Storage } from "node-appwrite";
+import { Avatars, Client, Databases, Health, Storage, Users } from "node-appwrite";
 
+type AppwriteServices = {
+    client: Client;
+    databases: Databases;
+    users: Users;
+    avatars: Avatars;
+    health: Health;
+    storage: Storage;
+};
 
-const client = new Client();
-const apiKey = process.env.APPWRITE_API_KEY?.trim();
-const endpoint =
-    process.env.APPWRITE_ENDPOINT?.trim() ||
-    process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT?.trim();
-const projectId =
-    process.env.APPWRITE_PROJECT_ID?.trim() ||
-    process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID?.trim();
+let servicesCache: AppwriteServices | null = null;
 
-if (!endpoint) {
-    throw new Error(
-        "Missing environment variable: APPWRITE_ENDPOINT or NEXT_PUBLIC_APPWRITE_ENDPOINT. Add it to .env and restart the dev server."
-    );
+function createServices(): AppwriteServices {
+    const apiKey = process.env.APPWRITE_API_KEY?.trim();
+    const endpoint =
+        process.env.APPWRITE_ENDPOINT?.trim() ||
+        process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT?.trim();
+    const projectId =
+        process.env.APPWRITE_PROJECT_ID?.trim() ||
+        process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID?.trim();
+
+    if (!endpoint) {
+        throw new Error(
+            "Missing environment variable: APPWRITE_ENDPOINT or NEXT_PUBLIC_APPWRITE_ENDPOINT. Add it to .env and restart the dev server."
+        );
+    }
+
+    if (!projectId) {
+        throw new Error(
+            "Missing environment variable: APPWRITE_PROJECT_ID or NEXT_PUBLIC_APPWRITE_PROJECT_ID. Add it to .env and restart the dev server."
+        );
+    }
+
+    if (!apiKey) {
+        throw new Error(
+            "Missing environment variable: APPWRITE_API_KEY. Add it to .env and restart the dev server."
+        );
+    }
+
+    const client = new Client().setEndpoint(endpoint).setProject(projectId).setKey(apiKey);
+
+    return {
+        client,
+        databases: new Databases(client),
+        users: new Users(client),
+        avatars: new Avatars(client),
+        health: new Health(client),
+        storage: new Storage(client),
+    };
 }
 
-if (!projectId) {
-    throw new Error(
-        "Missing environment variable: APPWRITE_PROJECT_ID or NEXT_PUBLIC_APPWRITE_PROJECT_ID. Add it to .env and restart the dev server."
-    );
+function getServices() {
+    if (!servicesCache) {
+        servicesCache = createServices();
+    }
+
+    return servicesCache;
 }
 
-if (!apiKey) {
-    throw new Error("Missing environment variable: APPWRITE_API_KEY. Add it to .env and restart the dev server.");
+function createLazyService<T extends object>(key: keyof AppwriteServices): T {
+    return new Proxy({} as T, {
+        get(_target, property, receiver) {
+            const service = getServices()[key] as T;
+            const value = Reflect.get(service, property, receiver);
+
+            return typeof value === "function" ? value.bind(service) : value;
+        },
+    });
 }
 
-client
-    .setEndpoint(endpoint) // Your API Endpoint
-    .setProject(projectId) // Your project ID
-    .setKey(apiKey) // Your secret API key
+const client = createLazyService<Client>("client");
+const databases = createLazyService<Databases>("databases");
+const users = createLazyService<Users>("users");
+const avatars = createLazyService<Avatars>("avatars");
+const health = createLazyService<Health>("health");
+const storage = createLazyService<Storage>("storage");
 
-;
-
-const databases = new Databases(client)
-const users = new Users(client);
-const avatars = new Avatars(client);
-const health = new Health(client);
-const storage = new Storage(client);
-
-export {client , databases , users,avatars,health,storage}
+export { client, databases, users, avatars, health, storage };
