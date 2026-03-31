@@ -5,10 +5,25 @@ import React from "react";
 import VoteButtons from "./VoteButton";
 import { useAuthStore } from "@/store/auth";
 import RTE, { MarkdownPreview } from "./RTE";
-import Comments from "./comment";
+import Comments, { type CommentView } from "./comment";
 import slugify from "@/utils/slugify";
 import Link from "next/link";
 import { IconTrash } from "@tabler/icons-react";
+
+export type AuthorView = {
+    $id: string;
+    name: string;
+    reputation: number;
+};
+
+export type AnswerView = Models.Document & {
+    authorId: string;
+    content: string;
+    author: AuthorView;
+    upvotesDocuments: Models.DocumentList<Models.Document>;
+    downvotesDocuments: Models.DocumentList<Models.Document>;
+    comments: Models.DocumentList<CommentView>;
+};
 
 function getInitials(name: string) {
     return name
@@ -36,7 +51,7 @@ const Answers = ({
     answers: _answers,
     questionId,
 }: {
-    answers: Models.DocumentList<Models.Document>;
+    answers: Models.DocumentList<AnswerView>;
     questionId: string;
 }) => {
     const [answers, setAnswers] = React.useState(_answers);
@@ -67,7 +82,11 @@ const Answers = ({
                 documents: [
                     {
                         ...data,
-                        author: user,
+                        author: {
+                            $id: user.$id,
+                            name: user.name,
+                            reputation: Number(user.prefs?.reputation || 0),
+                        },
                         upvotesDocuments: { documents: [], total: 0 },
                         downvotesDocuments: { documents: [], total: 0 },
                         comments: { documents: [], total: 0 },

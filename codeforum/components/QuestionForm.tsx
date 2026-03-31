@@ -16,6 +16,14 @@ import { databases, storage } from "@/models/client/config";
 import { db, questionAttachmentBucket, questionCollection } from "@/models/name";
 import { Confetti } from "@/components/magicui/confetti";
 
+type QuestionFormDocument = Models.Document & {
+    title?: string;
+    content?: string;
+    authorId?: string;
+    tags?: string[];
+    attachmentId?: string;
+};
+
 const LabelInputContainer = ({
     children,
     className,
@@ -41,7 +49,7 @@ const LabelInputContainer = ({
  * ![INFO]: for buttons, refer to https://ui.aceternity.com/components/tailwindcss-buttons
  * ******************************************************************************
  */
-const QuestionForm = ({ question }: { question?: Models.Document }) => {
+const QuestionForm = ({ question }: { question?: QuestionFormDocument }) => {
     const { user } = useAuthStore();
     const [tag, setTag] = React.useState("");
     const router = useRouter();
@@ -166,7 +174,9 @@ const QuestionForm = ({ question }: { question?: Models.Document }) => {
         const attachmentId = await (async () => {
             if (!formData.attachment) return question?.attachmentId as string;
 
-            await storage.deleteFile(questionAttachmentBucket, question.attachmentId);
+            if (question.attachmentId) {
+                await storage.deleteFile(questionAttachmentBucket, question.attachmentId);
+            }
 
             const file = await storage.createFile(
                 questionAttachmentBucket,

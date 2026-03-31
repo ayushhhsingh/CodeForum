@@ -9,6 +9,25 @@ import { Models, Query } from "appwrite";
 import { useRouter } from "next/navigation";
 import React from "react";
 
+export type VoteDocument = Models.Document & {
+    voteStatus: "upvoted" | "downvoted";
+};
+
+type VoteListDocument = Models.Document;
+
+function getErrorMessage(error: unknown, fallback: string) {
+    if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof error.message === "string"
+    ) {
+        return error.message;
+    }
+
+    return fallback;
+}
+
 const VoteButtons = ({
     type,
     id,
@@ -18,11 +37,11 @@ const VoteButtons = ({
 }: {
     type: "question" | "answer";
     id: string;
-    upvotes: Models.DocumentList<Models.Document>;
-    downvotes: Models.DocumentList<Models.Document>;
+    upvotes: Models.DocumentList<VoteListDocument>;
+    downvotes: Models.DocumentList<VoteListDocument>;
     className?: string;
 }) => {
-    const [votedDocument, setVotedDocument] = React.useState<Models.Document | null>(); // undefined means not fetched yet
+    const [votedDocument, setVotedDocument] = React.useState<VoteDocument | null>(); // undefined means not fetched yet
     const [voteResult, setVoteResult] = React.useState<number>(upvotes.total - downvotes.total);
     const [voteUnavailable, setVoteUnavailable] = React.useState(false);
 
@@ -33,7 +52,7 @@ const VoteButtons = ({
         (async () => {
             if (user) {
                 try {
-                    const response = await databases.listDocuments(db, voteCollection, [
+                    const response = await databases.listDocuments<VoteDocument>(db, voteCollection, [
                         Query.equal("type", type),
                         Query.equal("typeId", id),
                         Query.equal("votedById", user.$id),
@@ -72,9 +91,9 @@ const VoteButtons = ({
             if (!response.ok) throw data;
 
             setVoteResult(() => data.data.voteResult);
-            setVotedDocument(() => data.data.document);
-        } catch (error: any) {
-            window.alert(error?.message || "Something went wrong");
+            setVotedDocument(() => data.data.document as VoteDocument | null);
+        } catch (error: unknown) {
+            window.alert(getErrorMessage(error, "Something went wrong"));
         }
     };
 
@@ -100,9 +119,9 @@ const VoteButtons = ({
             if (!response.ok) throw data;
 
             setVoteResult(() => data.data.voteResult);
-            setVotedDocument(() => data.data.document);
-        } catch (error: any) {
-            window.alert(error?.message || "Something went wrong");
+            setVotedDocument(() => data.data.document as VoteDocument | null);
+        } catch (error: unknown) {
+            window.alert(getErrorMessage(error, "Something went wrong"));
         }
     };
 

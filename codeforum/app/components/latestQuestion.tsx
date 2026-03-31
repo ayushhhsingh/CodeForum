@@ -1,4 +1,4 @@
-import QuestionCard from "@/components/QuestionCard";
+import QuestionCard, { type QuestionCardData } from "@/components/QuestionCard";
 import {
     getAppwriteErrorMessage,
     isPausedProjectError,
@@ -8,21 +8,29 @@ import { answerCollection, db, questionCollection } from "@/models/name";
 import { databases, users } from "@/models/server/config";
 import type { UserPrefs } from "@/models/user";
 import { unstable_noStore as noStore } from "next/cache";
-import { Query } from "node-appwrite";
+import { Models, Query } from "node-appwrite";
 import React from "react";
+
+type QuestionDocument = Models.Document & {
+    authorId: string;
+    title: string;
+    content?: string;
+    tags: string[];
+    attachmentId?: string;
+};
 
 const LatestQuestions = async () => {
     noStore();
-    let questions: Awaited<ReturnType<typeof databases.listDocuments>> | null = null;
+    let questions: Models.DocumentList<QuestionDocument> | null = null;
     let message = "";
 
     try {
-        questions = await databases.listDocuments(db, questionCollection, [
+        questions = await databases.listDocuments<QuestionDocument>(db, questionCollection, [
             Query.limit(5),
             Query.orderDesc("$createdAt"),
         ]);
 
-        questions.documents = await Promise.all(
+        questions.documents = await Promise.all<QuestionCardData>(
             questions.documents.map(async ques => {
                 const [author, answers, votes] = await Promise.all([
                     users.get<UserPrefs>(ques.authorId),
@@ -63,7 +71,7 @@ const LatestQuestions = async () => {
     return (
         <div className="space-y-6">
             {questions.documents.map(question => (
-                <QuestionCard key={question.$id} ques={question} />
+                <QuestionCard key={question.$id} ques={question as QuestionCardData} />
             ))}
         </div>
     );

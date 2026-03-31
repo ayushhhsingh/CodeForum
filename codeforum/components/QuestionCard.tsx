@@ -8,6 +8,23 @@ import slugify from "@/utils/slugify";
 import convertDateToRelativeTime from "@/utils/relativeTime";
 import QuestionEditButton from "@/components/QuestionEditButton";
 
+type QuestionCardAuthor = {
+    $id: string;
+    name: string;
+    reputation: number;
+};
+
+export type QuestionCardData = Models.Document & {
+    authorId: string;
+    title: string;
+    content?: string;
+    tags: string[];
+    attachmentId?: string;
+    totalVotes: number;
+    totalAnswers: number;
+    author: QuestionCardAuthor;
+};
+
 function getInitials(name: string) {
     return name
         .trim()
@@ -17,7 +34,7 @@ function getInitials(name: string) {
         .join("");
 }
 
-const QuestionCard = ({ ques }: { ques: Models.Document }) => {
+const QuestionCard = ({ ques }: { ques: QuestionCardData }) => {
     return (
         <div
             className="group relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-white/10 bg-[#0b0b0f]/95 p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.03)] duration-200 hover:bg-[#101016] sm:flex-row"

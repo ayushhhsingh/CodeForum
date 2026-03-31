@@ -25,13 +25,13 @@ function requirePublicUrlEnv(name: string, value: string | undefined): string {
 }
 
 const NEXT_PUBLIC_APPWRITE_ENDPOINT = requirePublicUrlEnv(
-  "NEXT_PUBLIC_APPWRITE_ENDPOINT",
-  process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT
+  "NEXT_PUBLIC_APPWRITE_ENDPOINT or APPWRITE_ENDPOINT",
+  process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT ?? process.env.APPWRITE_ENDPOINT
 );
 
 const NEXT_PUBLIC_APPWRITE_PROJECT_ID = requirePublicEnv(
-  "NEXT_PUBLIC_APPWRITE_PROJECT_ID",
-  process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID
+  "NEXT_PUBLIC_APPWRITE_PROJECT_ID or APPWRITE_PROJECT_ID",
+  process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID ?? process.env.APPWRITE_PROJECT_ID
 );
 
 const env = {

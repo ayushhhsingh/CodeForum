@@ -83,7 +83,7 @@ export default function ProfileAvatarUploader({
         }
       }
 
-      const nextAvatarUrl = storage.getFileView(profileAvatarBucket, uploaded.$id).href;
+      const nextAvatarUrl = storage.getFileView(profileAvatarBucket, uploaded.$id);
       const existingPrefs = user.prefs || ({} as UserPrefs);
 
       await account.updatePrefs({

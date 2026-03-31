@@ -8,6 +8,7 @@ import AnimatedGridPattern from "@/components/magicui/animated-grid-pattern";
 import ProfileAvatarUploader from "@/components/ProfileAvatarUploader";
 import convertDateToRelativeTime from "@/utils/relativeTime";
 import { cn } from "@/utils/cn";
+import { Models } from "node-appwrite";
 import React from "react";
 import EditButton from "../../EditButton";
 import Navbar from "../../Navbar";
@@ -21,7 +22,7 @@ const Layout = async ({
   params: Promise<{ userId: string; userSlug: string }>;
 }) => {
   const { userId } = await params;
-  let user: UserPrefs | null = null;
+  let user: Models.User<UserPrefs> | null = null;
   let message = "";
 
   try {
