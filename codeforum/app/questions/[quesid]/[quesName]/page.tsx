@@ -8,8 +8,7 @@ import {
   isPausedProjectError,
 } from "@/lib/appwrite-error";
 import { listCommentsSafe, listVotesSafe, toPlain } from "@/lib/appwrite-documents";
-import { storage as clientStorage } from "@/models/client/config";
-import { answerCollection, db, questionAttachmentBucket, questionCollection } from "@/models/name";
+import { answerCollection, db, questionCollection } from "@/models/name";
 import { databases, users } from "@/models/server/config";
 import convertDateToRelativeTime from "@/utils/relativeTime";
 import slugify from "@/utils/slugify";
@@ -178,7 +177,7 @@ export default async function QuestionPage({
             {question.attachmentId ? (
               <div className="mb-4 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-2">
                 <img
-                  src={clientStorage.getFileView(questionAttachmentBucket, question.attachmentId)}
+                  src={`/api/question-attachment/${question.attachmentId}`}
                   alt={question.title}
                   className="max-h-[28rem] w-full rounded-xl object-contain"
                 />
