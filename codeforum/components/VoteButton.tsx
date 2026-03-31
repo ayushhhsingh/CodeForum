@@ -13,6 +13,8 @@ export type VoteDocument = Models.Document & {
     voteStatus: "upvoted" | "downvoted";
 };
 
+type VoteListDocument = Models.Document;
+
 function getErrorMessage(error: unknown, fallback: string) {
     if (
         typeof error === "object" &&
@@ -35,8 +37,8 @@ const VoteButtons = ({
 }: {
     type: "question" | "answer";
     id: string;
-    upvotes: Models.DocumentList<VoteDocument>;
-    downvotes: Models.DocumentList<VoteDocument>;
+    upvotes: Models.DocumentList<VoteListDocument>;
+    downvotes: Models.DocumentList<VoteListDocument>;
     className?: string;
 }) => {
     const [votedDocument, setVotedDocument] = React.useState<VoteDocument | null>(); // undefined means not fetched yet
@@ -50,7 +52,7 @@ const VoteButtons = ({
         (async () => {
             if (user) {
                 try {
-                    const response = await databases.listDocuments(db, voteCollection, [
+                    const response = await databases.listDocuments<VoteDocument>(db, voteCollection, [
                         Query.equal("type", type),
                         Query.equal("typeId", id),
                         Query.equal("votedById", user.$id),
@@ -89,7 +91,7 @@ const VoteButtons = ({
             if (!response.ok) throw data;
 
             setVoteResult(() => data.data.voteResult);
-            setVotedDocument(() => data.data.document);
+            setVotedDocument(() => data.data.document as VoteDocument | null);
         } catch (error: unknown) {
             window.alert(getErrorMessage(error, "Something went wrong"));
         }
@@ -117,7 +119,7 @@ const VoteButtons = ({
             if (!response.ok) throw data;
 
             setVoteResult(() => data.data.voteResult);
-            setVotedDocument(() => data.data.document);
+            setVotedDocument(() => data.data.document as VoteDocument | null);
         } catch (error: unknown) {
             window.alert(getErrorMessage(error, "Something went wrong"));
         }
