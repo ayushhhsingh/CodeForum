@@ -11,13 +11,37 @@ import { ID, Models } from "appwrite";
 import Link from "next/link";
 import React from "react";
 
+export type CommentAuthor = {
+    $id: string;
+    name: string;
+};
+
+export type CommentView = Models.Document & {
+    authorId: string;
+    content: string;
+    author: CommentAuthor;
+};
+
+function getErrorMessage(error: unknown, fallback: string) {
+    if (
+        typeof error === "object" &&
+        error !== null &&
+        "message" in error &&
+        typeof error.message === "string"
+    ) {
+        return error.message;
+    }
+
+    return fallback;
+}
+
 const Comments = ({
     comments: _comments,
     type,
     typeId,
     className,
 }: {
-    comments: Models.DocumentList<Models.Document>;
+    comments: Models.DocumentList<CommentView>;
     type: "question" | "answer";
     typeId: string;
     className?: string;
@@ -37,14 +61,23 @@ const Comments = ({
                 targetType: type,
                 targetId: typeId,
             });
+            const nextComment: CommentView = {
+                ...response,
+                authorId: user.$id,
+                content: newComment,
+                author: {
+                    $id: user.$id,
+                    name: user.name,
+                },
+            };
 
             setNewComment(() => "");
             setComments(prev => ({
                 total: prev.total + 1,
-                documents: [{ ...response, author: user }, ...prev.documents],
+                documents: [nextComment, ...prev.documents],
             }));
-        } catch (error: any) {
-            window.alert(error?.message || "Error creating comment");
+        } catch (error: unknown) {
+            window.alert(getErrorMessage(error, "Error creating comment"));
         }
     };
 
@@ -56,8 +89,8 @@ const Comments = ({
                 total: prev.total - 1,
                 documents: prev.documents.filter(comment => comment.$id !== commentId),
             }));
-        } catch (error: any) {
-            window.alert(error?.message || "Error deleting comment");
+        } catch (error: unknown) {
+            window.alert(getErrorMessage(error, "Error deleting comment"));
         }
     };
 

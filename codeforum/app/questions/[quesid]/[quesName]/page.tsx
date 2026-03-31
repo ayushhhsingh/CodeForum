@@ -1,8 +1,8 @@
-import Answers from "@/components/Answers";
-import Comments from "@/components/comment";
+import Answers, { type AnswerView } from "@/components/Answers";
+import Comments, { type CommentView } from "@/components/comment";
 import QuestionEditButton from "@/components/QuestionEditButton";
 import { MarkdownPreview } from "@/components/RTE";
-import VoteButtons from "@/components/VoteButton";
+import VoteButtons, { type VoteDocument } from "@/components/VoteButton";
 import {
   getAppwriteErrorMessage,
   isPausedProjectError,
@@ -13,9 +13,28 @@ import { answerCollection, db, questionAttachmentBucket, questionCollection } fr
 import { databases, users } from "@/models/server/config";
 import convertDateToRelativeTime from "@/utils/relativeTime";
 import slugify from "@/utils/slugify";
-import { Query } from "node-appwrite";
+import { Models, Query } from "node-appwrite";
 import Link from "next/link";
 import Search from "./search";
+
+type QuestionDocument = Models.Document & {
+  authorId: string;
+  title: string;
+  content: string;
+  tags?: string[];
+  attachmentId?: string;
+};
+
+type AnswerDocument = Models.Document & {
+  authorId: string;
+  content: string;
+  questionId: string;
+};
+
+type CommentDocument = Models.Document & {
+  authorId: string;
+  content: string;
+};
 
 async function getQuestionWithRetry(questionId: string) {
   const retryDelays = [0, 250, 750];
@@ -27,7 +46,7 @@ async function getQuestionWithRetry(questionId: string) {
     }
 
     try {
-      return await databases.getDocument(db, questionCollection, questionId);
+      return await databases.getDocument<QuestionDocument>(db, questionCollection, questionId);
     } catch (error) {
       lastError = error;
     }
@@ -37,7 +56,7 @@ async function getQuestionWithRetry(questionId: string) {
 }
 
 async function enrichComments(type: "question" | "answer", typeId: string) {
-  const comments = await listCommentsSafe(type, typeId);
+  const comments = await listCommentsSafe(type, typeId) as Models.DocumentList<CommentDocument>;
 
   comments.documents = await Promise.all(
     comments.documents.map(async (comment) => {
@@ -53,7 +72,7 @@ async function enrichComments(type: "question" | "answer", typeId: string) {
     })
   );
 
-  return toPlain(comments);
+  return toPlain(comments) as Models.DocumentList<CommentView>;
 }
 
 export default async function QuestionPage({
@@ -71,16 +90,18 @@ export default async function QuestionPage({
       listVotesSafe("question", quesid, "upvoted"),
       listVotesSafe("question", quesid, "downvoted"),
       enrichComments("question", quesid),
-      databases.listDocuments(db, answerCollection, [
+      databases.listDocuments<AnswerDocument>(db, answerCollection, [
         Query.equal("questionId", quesid),
         Query.orderDesc("$createdAt"),
         Query.limit(100),
       ]),
     ]);
 
-    const plainAnswers = toPlain(answers);
-    plainAnswers.documents = await Promise.all(
-      plainAnswers.documents.map(async (answer) => {
+    const plainAnswers = toPlain(answers) as Models.DocumentList<AnswerDocument>;
+    const enrichedAnswers: Models.DocumentList<AnswerView> = {
+      ...plainAnswers,
+      documents: await Promise.all(
+        plainAnswers.documents.map(async (answer) => {
         const [answerAuthor, answerUpvotes, answerDownvotes, answerComments] =
           await Promise.all([
             users.get(answer.authorId),
@@ -101,7 +122,8 @@ export default async function QuestionPage({
           comments: answerComments,
         };
       })
-    );
+      ),
+    };
 
     return (
       <main className="mx-auto max-w-6xl px-4 pb-20 pt-28">
@@ -148,15 +170,15 @@ export default async function QuestionPage({
           <VoteButtons
             type="question"
             id={question.$id}
-            upvotes={upvotes}
-            downvotes={downvotes}
+            upvotes={upvotes as Models.DocumentList<VoteDocument>}
+            downvotes={downvotes as Models.DocumentList<VoteDocument>}
             className="pt-4"
           />
           <div className="min-w-0 flex-1">
             {question.attachmentId ? (
               <div className="mb-4 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-2">
                 <img
-                  src={clientStorage.getFileView(questionAttachmentBucket, question.attachmentId).href}
+                  src={clientStorage.getFileView(questionAttachmentBucket, question.attachmentId)}
                   alt={question.title}
                   className="max-h-[28rem] w-full rounded-xl object-contain"
                 />
@@ -178,7 +200,7 @@ export default async function QuestionPage({
         </div>
 
         <section className="mt-10">
-          <Answers answers={toPlain(plainAnswers)} questionId={question.$id} />
+          <Answers answers={toPlain(enrichedAnswers)} questionId={question.$id} />
         </section>
       </main>
     );

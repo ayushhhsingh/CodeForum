@@ -34,7 +34,7 @@ export default async function HeroSection() {
             title: q.title,
             link: `/questions/${q.$id}/${slugify(q.title)}`,
             thumbnail: q.attachmentId
-                ? storage.getFilePreview(questionAttachmentBucket, q.attachmentId).href
+                ? storage.getFilePreview(questionAttachmentBucket, q.attachmentId)
                 : "/globe.svg",
         }));
     } catch (error) {

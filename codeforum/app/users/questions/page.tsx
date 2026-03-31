@@ -1,10 +1,18 @@
 import Pagination from "@/components/pagination";
-import QuestionCard from "@/components/QuestionCard";
+import QuestionCard, { type QuestionCardData } from "@/components/QuestionCard";
 import { answerCollection, db, questionCollection, voteCollection } from "@/models/name";
 import { databases, users } from "@/models/server/config";
 import type { UserPrefs } from "@/models/user";
-import { Query } from "node-appwrite";
+import { Models, Query } from "node-appwrite";
 import React from "react";
+
+type QuestionDocument = Models.Document & {
+    authorId: string;
+    title: string;
+    content?: string;
+    tags: string[];
+    attachmentId?: string;
+};
 
 const Page = async ({
     params,
@@ -22,9 +30,9 @@ const Page = async ({
         Query.limit(25),
     ];
 
-    const questions = await databases.listDocuments(db, questionCollection, queries);
+    const questions = await databases.listDocuments<QuestionDocument>(db, questionCollection, queries);
 
-    questions.documents = await Promise.all(
+    questions.documents = await Promise.all<QuestionCardData>(
         questions.documents.map(async ques => {
             const [author, answers, votes] = await Promise.all([
                 users.get<UserPrefs>(ques.authorId),
@@ -59,7 +67,7 @@ const Page = async ({
             </div>
             <div className="mb-4 max-w-3xl space-y-6">
                 {questions.documents.map(ques => (
-                    <QuestionCard key={ques.$id} ques={ques} />
+                    <QuestionCard key={ques.$id} ques={ques as QuestionCardData} />
                 ))}
             </div>
             <Pagination total={questions.total} limit={25} />
