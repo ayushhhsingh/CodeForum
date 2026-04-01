@@ -37,7 +37,7 @@ export default function QuestionsPage() {
           </div>
           <Link
             href="/questions/ask"
-            className="rounded-full border border-white/10 bg-white/5 px-6 py-3 font-medium text-white shadow-[0_0_30px_rgba(255,255,255,0.08)] transition hover:bg-white/10"
+            className="rounded-full border border-white/10 bg-white/5 px-6 py-3 font-medium text-white shadow-[0_0_30px_rgba(255,255,255,0.08)] transition-all duration-200 hover:bg-white/10 active:scale-95"
           >
             Ask Question
           </Link>
