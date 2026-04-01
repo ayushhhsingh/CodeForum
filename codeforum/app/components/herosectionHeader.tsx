@@ -64,11 +64,11 @@ const HeroSectionHeader = () => {
                     />
                 </div>
             </div>
-            <h1 className="pointer-events-none absolute left-1/2 top-1/2 z-10 w-full max-w-5xl -translate-x-1/2 -translate-y-1/2 whitespace-pre-wrap bg-gradient-to-b from-[#ffd319] via-[#ff2975] to-[#8c1eff] bg-clip-text px-4 text-center text-5xl font-bold leading-none tracking-tight text-transparent sm:text-6xl lg:text-8xl">
-                CodeForum
-            </h1>
-            <div className="absolute left-1/2 top-[calc(50%+4.6rem)] z-10 w-full max-w-4xl -translate-x-1/2 px-4 text-center sm:top-[calc(50%+5.1rem)] lg:top-[calc(50%+6rem)]">
-                <p className="mx-auto max-w-3xl text-base font-semibold leading-relaxed tracking-tight text-white/90 sm:text-lg lg:text-xl">
+            <div className="absolute left-1/2 top-1/2 z-10 flex w-full max-w-4xl -translate-x-1/2 -translate-y-1/2 flex-col items-center px-4 text-center">
+                <h1 className="pointer-events-none w-full max-w-5xl whitespace-pre-wrap bg-gradient-to-b from-[#ffd319] via-[#ff2975] to-[#8c1eff] bg-clip-text px-4 text-center text-5xl font-bold leading-none tracking-tight text-transparent sm:text-6xl lg:text-8xl">
+                    CodeForum
+                </h1>
+                <p className="mt-6 text-center text-xl font-bold leading-none tracking-tighter">
                     Ask questions, share knowledge, and collaborate with developers
                     worldwide. Join our community and enhance your coding skills!
                 </p>
@@ -100,10 +100,8 @@ const HeroSectionHeader = () => {
                         </>
                     )}
                 </div>
-            </div>
-            <div className="absolute bottom-8 left-1/2 z-10 hidden w-full max-w-[52rem] -translate-x-1/2 px-4 md:block">
-                <div className="relative w-full rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,165,0,0.18),transparent_60%)]" />
+                <div className="relative mt-10 w-full max-w-[32rem] rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm md:p-10">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,165,0,0.2),transparent_55%)]" />
                     <div className="relative flex flex-wrap justify-center gap-3">
                         {slugs.map(slug => (
                             <span
