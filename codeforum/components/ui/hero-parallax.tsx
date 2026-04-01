@@ -89,6 +89,7 @@ export const ProductCard = ({
     translate: MotionValue<number>;
 }) => {
     const thumbnailSrc = product.thumbnail?.trim() || "/globe.svg";
+    const isFallbackGlobe = thumbnailSrc === "/globe.svg";
 
     return (
         <motion.div
@@ -106,7 +107,11 @@ export const ProductCard = ({
                     src={thumbnailSrc}
                     height="600"
                     width="600"
-                    className="absolute inset-0 h-full w-full object-cover object-left-top"
+                    className={`absolute inset-0 h-full w-full ${
+                        isFallbackGlobe
+                            ? "object-contain p-20 opacity-30"
+                            : "object-cover object-left-top"
+                    }`}
                     alt={product.title}
                 />
             </Link>
