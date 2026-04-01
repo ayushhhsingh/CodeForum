@@ -53,18 +53,16 @@ const HeroSectionHeader = () => {
                 refresh
             />
             <div className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center">
-                <div className="rounded-full bg-gradient-to-b from-white/10 to-transparent p-8 md:p-10">
-                    <Image
-                        src="/globe.svg"
-                        alt=""
-                        aria-hidden
-                        width={320}
-                        height={320}
-                        className="h-36 w-36 opacity-20 blur-[1px] md:h-52 md:w-52"
-                    />
-                </div>
+                <Image
+                    src="/globe.svg"
+                    alt=""
+                    aria-hidden
+                    width={320}
+                    height={320}
+                    className="h-36 w-36 opacity-20 blur-[1px] md:h-52 md:w-52"
+                />
             </div>
-            <div className="absolute left-1/2 top-1/2 z-10 flex w-full max-w-4xl -translate-x-1/2 -translate-y-1/2 flex-col items-center px-4 text-center">
+            <div className="absolute left-1/2 top-1/2 z-10 flex w-full max-w-4xl -translate-x-1/2 -translate-y-1/2 flex-col items-center px-4 pt-16 text-center sm:pt-20">
                 <h1 className="pointer-events-none w-full max-w-5xl whitespace-pre-wrap bg-gradient-to-b from-[#ffd319] via-[#ff2975] to-[#8c1eff] bg-clip-text px-4 text-center text-5xl font-bold leading-none tracking-tight text-transparent sm:text-6xl lg:text-8xl">
                     CodeForum
                 </h1>
@@ -100,9 +98,12 @@ const HeroSectionHeader = () => {
                         </>
                     )}
                 </div>
-                <div className="relative mt-10 w-full max-w-[32rem] rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm md:p-10">
+                <div className="relative mt-10 w-full max-w-[34rem] rounded-3xl border border-white/10 bg-white/5 p-10 backdrop-blur-sm md:p-12">
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,165,0,0.2),transparent_55%)]" />
                     <div className="relative flex flex-wrap justify-center gap-3">
+                        <p className="mb-2 w-full text-center text-sm uppercase tracking-[0.25em] text-white/70">
+                            Topics to discuss
+                        </p>
                         {slugs.map(slug => (
                             <span
                                 key={slug}
