@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useAuthStore } from "@/store/auth";
+import { usePathname, useRouter } from "next/navigation";
 
 export const FloatingNav = ({
     navItems,
@@ -17,6 +18,10 @@ export const FloatingNav = ({
     className?: string;
 }) => {
     const { scrollYProgress, scrollY } = useScroll();
+    const pathname = usePathname();
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+    const [pendingLink, setPendingLink] = useState<string | null>(null);
 
     const { session, logout } = useAuthStore();
 
@@ -66,18 +71,38 @@ export const FloatingNav = ({
                     <Link
                         key={`link=${idx}`}
                         href={navItem.link}
+                        onClick={event => {
+                            if (pathname === navItem.link || isPending) {
+                                event.preventDefault();
+                                return;
+                            }
+                            event.preventDefault();
+                            setPendingLink(navItem.link);
+                            startTransition(() => {
+                                router.push(navItem.link);
+                            });
+                        }}
                         className={cn(
-                            "relative flex items-center space-x-1 text-neutral-600 hover:text-neutral-500 dark:text-neutral-50 dark:hover:text-neutral-300"
+                            "relative flex items-center space-x-1 rounded-full px-3 py-2 text-neutral-600 transition-all duration-200 hover:bg-black/5 hover:text-neutral-900 active:scale-95 dark:text-neutral-50 dark:hover:bg-white/10 dark:hover:text-white",
+                            pathname === navItem.link && "bg-black/10 text-neutral-900 dark:bg-white/15 dark:text-white",
+                            isPending &&
+                                pendingLink === navItem.link &&
+                                "cursor-wait bg-black/10 text-neutral-900 dark:bg-white/20 dark:text-white"
                         )}
+                        aria-busy={isPending && pendingLink === navItem.link}
                     >
                         <span className="block sm:hidden">{navItem.icon}</span>
-                        <span className="hidden text-sm sm:block">{navItem.name}</span>
+                        <span className="hidden text-sm sm:block">
+                            {isPending && pendingLink === navItem.link
+                                ? "Opening..."
+                                : navItem.name}
+                        </span>
                     </Link>
                 ))}
                 {session ? (
                     <button
                         onClick={logout}
-                        className="relative rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-medium text-black dark:border-white/[0.2] dark:text-white"
+                        className="relative rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-medium text-black transition-all duration-200 hover:bg-black/5 active:scale-95 dark:border-white/[0.2] dark:text-white dark:hover:bg-white/10"
                     >
                         <span>Logout</span>
                         <span className="absolute inset-x-0 -bottom-px mx-auto h-px w-1/2 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
@@ -86,14 +111,14 @@ export const FloatingNav = ({
                     <>
                         <Link
                             href="/login"
-                            className="relative rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-medium text-black dark:border-white/[0.2] dark:text-white"
+                            className="relative rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-medium text-black transition-all duration-200 hover:bg-black/5 active:scale-95 dark:border-white/[0.2] dark:text-white dark:hover:bg-white/10"
                         >
                             <span>Login</span>
                             <span className="absolute inset-x-0 -bottom-px mx-auto h-px w-1/2 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
                         </Link>
                         <Link
                             href="/register"
-                            className="relative rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-medium text-black dark:border-white/[0.2] dark:text-white"
+                            className="relative rounded-full border border-neutral-200 px-5 py-2.5 text-sm font-medium text-black transition-all duration-200 hover:bg-black/5 active:scale-95 dark:border-white/[0.2] dark:text-white dark:hover:bg-white/10"
                         >
                             <span>Signup</span>
                             <span className="absolute inset-x-0 -bottom-px mx-auto h-px w-1/2 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
