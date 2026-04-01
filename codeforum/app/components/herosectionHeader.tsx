@@ -4,6 +4,7 @@ import Particles from "@/components/magicui/particles";
 import ShimmerButton from "@/components/magicui/shimmer-button";
 import { useAuthStore } from "@/store/auth";
 import Link from "next/link";
+import Image from "next/image";
 import React from "react";
 
 const slugs = [
@@ -43,7 +44,7 @@ const HeroSectionHeader = () => {
     const { hydrated, session } = useAuthStore();
 
     return (
-        <div className="container mx-auto px-4">
+        <section className="relative min-h-screen px-4">
             <Particles
                 className="fixed inset-0 h-full w-full"
                 quantity={500}
@@ -51,46 +52,58 @@ const HeroSectionHeader = () => {
                 color="#ffffff"
                 refresh
             />
-            <div className="relative z-10 flex flex-col items-center gap-16 pt-10 text-center">
-                <div className="mx-auto max-w-4xl space-y-6">
-                    <h1 className="pointer-events-none z-10 whitespace-pre-wrap bg-gradient-to-b from-[#ffd319] via-[#ff2975] to-[#8c1eff] bg-clip-text text-center text-7xl font-bold leading-none tracking-tighter text-transparent">
-                        CodeForum
-                    </h1>
-                    <p className="text-center text-xl font-bold leading-none tracking-tighter">
-                        Ask questions, share knowledge, and collaborate with developers
-                        worldwide. Join our community and enhance your coding skills!
-                    </p>
-                    <div className="flex flex-wrap items-center justify-center gap-4">
-                        {!hydrated ? null : session ? (
-                            <Link href="/questions/ask">
+            <div className="pointer-events-none absolute inset-0 z-[1] flex items-center justify-center">
+                <div className="rounded-full bg-gradient-to-b from-white/10 to-transparent p-8 md:p-10">
+                    <Image
+                        src="/globe.svg"
+                        alt=""
+                        aria-hidden
+                        width={320}
+                        height={320}
+                        className="h-36 w-36 opacity-20 blur-[1px] md:h-52 md:w-52"
+                    />
+                </div>
+            </div>
+            <h1 className="pointer-events-none absolute left-1/2 top-1/2 z-10 w-full max-w-5xl -translate-x-1/2 -translate-y-1/2 whitespace-pre-wrap bg-gradient-to-b from-[#ffd319] via-[#ff2975] to-[#8c1eff] bg-clip-text px-4 text-center text-5xl font-bold leading-none tracking-tight text-transparent sm:text-6xl lg:text-8xl">
+                CodeForum
+            </h1>
+            <div className="absolute left-1/2 top-[calc(50%+4.6rem)] z-10 w-full max-w-4xl -translate-x-1/2 px-4 text-center sm:top-[calc(50%+5.1rem)] lg:top-[calc(50%+6rem)]">
+                <p className="mx-auto max-w-3xl text-base font-semibold leading-relaxed tracking-tight text-white/90 sm:text-lg lg:text-xl">
+                    Ask questions, share knowledge, and collaborate with developers
+                    worldwide. Join our community and enhance your coding skills!
+                </p>
+                <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
+                    {!hydrated ? null : session ? (
+                        <Link href="/questions/ask">
+                            <ShimmerButton className="shadow-2xl">
+                                <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
+                                    Ask a question
+                                </span>
+                            </ShimmerButton>
+                        </Link>
+                    ) : (
+                        <>
+                            <Link href="/register">
                                 <ShimmerButton className="shadow-2xl">
                                     <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
-                                        Ask a question
+                                        Sign up
                                     </span>
                                 </ShimmerButton>
                             </Link>
-                        ) : (
-                            <>
-                                <Link href="/register">
-                                    <ShimmerButton className="shadow-2xl">
-                                        <span className="whitespace-pre-wrap text-center text-sm font-medium leading-none tracking-tight text-white dark:from-white dark:to-slate-900/10 lg:text-lg">
-                                            Sign up
-                                        </span>
-                                    </ShimmerButton>
-                                </Link>
-                                <Link
-                                    href="/login"
-                                    className="relative rounded-full border border-neutral-200 px-8 py-3 font-medium text-black dark:border-white/[0.2] dark:text-white"
-                                >
-                                    <span>Login</span>
-                                    <span className="absolute inset-x-0 -bottom-px mx-auto h-px w-1/2 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
-                                </Link>
-                            </>
-                        )}
-                    </div>
+                            <Link
+                                href="/login"
+                                className="relative rounded-full border border-neutral-200 px-8 py-3 font-medium text-black dark:border-white/[0.2] dark:text-white"
+                            >
+                                <span>Login</span>
+                                <span className="absolute inset-x-0 -bottom-px mx-auto h-px w-1/2 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
+                            </Link>
+                        </>
+                    )}
                 </div>
-                <div className="relative w-full max-w-[32rem] rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,165,0,0.2),transparent_55%)]" />
+            </div>
+            <div className="absolute bottom-8 left-1/2 z-10 hidden w-full max-w-[52rem] -translate-x-1/2 px-4 md:block">
+                <div className="relative w-full rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,165,0,0.18),transparent_60%)]" />
                     <div className="relative flex flex-wrap justify-center gap-3">
                         {slugs.map(slug => (
                             <span
@@ -103,7 +116,7 @@ const HeroSectionHeader = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 };
 
