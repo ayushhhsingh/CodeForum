@@ -29,10 +29,10 @@
 |---|---|---|
 | **Framework** | Next.js 14 | SSR, file-based routing, API routes in one place |
 | **Language** | TypeScript | End-to-end type safety — 97%+ of the codebase |
-| **Styling** | CSS Modules | Scoped, maintainable component styles |
-| **ORM** | Prisma | Type-safe DB queries with auto-generated client |
-| **Database** | PostgreSQL | Reliable relational DB for structured Q&A data |
-| **Auth** | NextAuth.js | Session-based authentication made simple |
+| **UI Library** | Magic UI | Animated, production-ready components out of the box |
+| **Backend** | Appwrite | Auth, database, storage & serverless functions — all in one |
+| **Database** | Appwrite DB | Flexible document-based data storage with real-time support |
+| **Auth** | Appwrite Auth | Secure user management with OAuth & email/password |
 | **Deployment** | Vercel | Zero-config CI/CD with instant preview deploys |
 
 ---
@@ -59,10 +59,9 @@ CodeForum/
 │   │   ├── (auth)/            # Auth pages (login, register)
 │   │   ├── (root)/            # Main app pages
 │   │   └── api/               # Serverless API routes
-│   ├── components/            # Reusable UI components
-│   ├── lib/                   # Shared utilities & DB client
-│   ├── prisma/
-│   │   └── schema.prisma      # Database schema
+│   ├── components/            # Reusable UI + Magic UI components
+│   ├── lib/
+│   │   └── appwrite.ts        # Appwrite client & config
 │   └── public/                # Static assets
 └── README.md
 ```
@@ -78,7 +77,7 @@ node -v   # v18+
 npm -v    # v9+
 ```
 
-You'll also need a **PostgreSQL** database (local or cloud, e.g. [Neon](https://neon.tech), [Supabase](https://supabase.com)).
+You'll also need an **Appwrite** project — create a free one at [cloud.appwrite.io](https://cloud.appwrite.io).
 
 ### Installation
 
@@ -99,24 +98,17 @@ cp .env.example .env
 Create a `.env` file with the following:
 
 ```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/codeforum"
-
-# NextAuth
-NEXTAUTH_SECRET="your-super-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
+# Appwrite
+NEXT_PUBLIC_APPWRITE_ENDPOINT="https://cloud.appwrite.io/v1"
+NEXT_PUBLIC_APPWRITE_PROJECT_ID="your-project-id"
+NEXT_PUBLIC_APPWRITE_DATABASE_ID="your-database-id"
+NEXT_PUBLIC_APPWRITE_COLLECTION_ID="your-collection-id"
 ```
 
 ### Run the App
 
 ```bash
-# 4. Push DB schema
-npx prisma db push
-
-# 5. (Optional) Seed with sample data
-npx prisma db seed
-
-# 6. Start dev server
+# 4. Start dev server
 npm run dev
 ```
 
@@ -131,8 +123,6 @@ Open [http://localhost:3000](http://localhost:3000) — you're live! 🎉
 | `npm run dev` | Start development server |
 | `npm run build` | Build for production |
 | `npm start` | Run production build |
-| `npx prisma studio` | Open Prisma DB GUI |
-| `npx prisma db push` | Sync schema to database |
 
 ---
 
@@ -152,10 +142,10 @@ To deploy your own fork:
 ## 🧩 What I Learned
 
 - Architecting a **full-stack TypeScript application** from scratch using Next.js
-- Designing a **relational database schema** for a complex social/Q&A system
-- Implementing **authentication flows** with session management
-- Setting up **serverless API routes** within the Next.js framework
-- Working with **Prisma ORM** for type-safe database operations
+- Integrating **Appwrite** as a complete BaaS — handling auth, database, and storage without a custom backend
+- Building polished UIs with **Magic UI** animated components for a production-grade feel
+- Implementing **secure authentication flows** with Appwrite's built-in user management
+- Structuring a **document-based data model** for a complex Q&A system
 - Deploying and managing a production app on **Vercel**
 
 ---
